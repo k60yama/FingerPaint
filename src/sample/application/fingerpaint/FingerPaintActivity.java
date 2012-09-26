@@ -5,12 +5,17 @@ import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.media.MediaScannerConnection;
@@ -183,6 +188,25 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		case R.id.menu_save:
 			save();
 			break;
+		case R.id.menu_open:
+			Intent intent = new Intent(this, FilePicker.class);
+			startActivityForResult(intent, 0);
+			break;
+		case R.id.menu_color_change:
+			final String[] items = getResources().getStringArray(R.array.ColorName);
+			final int[] colors = getResources().getIntArray(R.array.Color);
+			
+			AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string.menu_color_change);
+			ab.setItems(items, new DialogInterface.OnClickListener(){
+				public void onClick(DialogInterface dialog, int item){
+					paint.setColor(colors[item]);
+				}
+			});
+			ab.show();
+			break;
+		case R.id.menu_new:
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -209,5 +233,51 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	//メディアスキャンサービスの切断処理
 	public void disconnect(){
 		mc.disconnect();
+	}
+	
+	//画像ファイルの読み込み
+	public Bitmap loadImage(String path){
+		boolean landscape = false;
+		Bitmap bm;
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(path, options);
+		int oh = options.outHeight;
+		int ow = options.outWidth;
+		
+		if(ow>oh){
+			landscape = true;
+			oh = options.outWidth;
+			ow = options.outHeight;
+		}
+		
+		options.inJustDecodeBounds = false;
+		options.inSampleSize = Math.max(ow/w, oh/h);
+		bm = BitmapFactory.decodeFile(path, options);
+		
+		if(landscape){
+			Matrix matrix = new Matrix();
+			matrix.setRotate(90.0f);
+			bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, false);
+		}
+		
+		bm = Bitmap.createScaledBitmap(
+				bm, (int)(w), (int)(w*((double)oh)/((double)ow)), false);
+		
+		Bitmap offBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		Canvas offCanvas = new Canvas(offBitmap);
+		offCanvas.drawBitmap(bm, 0, (h-bm.getHeight()) / 2, null);
+		bm = offBitmap;
+		return bm;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		bitmap = loadImage(data.getStringExtra("fn"));
+		canvas = new Canvas(bitmap);
+		ImageView iv = (ImageView)this.findViewById(R.id.imageView1);
+		iv.setImageBitmap(bitmap);
 	}
 }

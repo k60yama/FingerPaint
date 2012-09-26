@@ -20,16 +20,16 @@ public class MemopadActivity extends Activity {
     /** Called when the activity is first created. */
     @Override
     
-    //ƒCƒ“ƒXƒ^ƒ“ƒXƒƒ\ƒbƒh
+    //ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½\ï¿½bï¿½h
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //this(MemopadActivityƒNƒ‰ƒX)
+        //this(MemopadActivityï¿½Nï¿½ï¿½ï¿½X)
         this.setContentView(R.layout.main);
         
-        //ƒCƒ“ƒXƒ^ƒ“ƒXƒƒ\ƒbƒh
-        //this(MemopadActivityƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒXƒƒ\ƒbƒh)
-        //(EditText)ƒLƒƒƒXƒg‚µ‚Ä‚¢‚é
-        //ƒƒ‚’ ‚ğ•\¦
+        //ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½\ï¿½bï¿½h
+        //this(MemopadActivityï¿½Nï¿½ï¿½ï¿½Xï¿½ÌƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½\ï¿½bï¿½h)
+        //(EditText)ï¿½Lï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½
         EditText et = (EditText) this.findViewById(R.id.editText1);
         SharedPreferences pref = this.getSharedPreferences("MemoPref", MODE_PRIVATE);
         et.setText(pref.getString("memo",""));
@@ -43,10 +43,10 @@ public class MemopadActivity extends Activity {
     	SharedPreferences pref = this.getSharedPreferences("MemoPrefs",MODE_PRIVATE);
     	SharedPreferences.Editor editor = pref.edit();
     	
-    	//ƒƒ‚’ ‚É‹LÚ‚³‚ê‚Ä‚¢‚é•¶š—ñ‚ğæ“¾
+    	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É‹Lï¿½Ú‚ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é•¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾
     	editor.putString("memo", et.getText().toString());
     	
-    	//getSelectionStart‚ÍƒNƒ‰ƒXƒƒ\ƒbƒh
+    	//getSelectionStartï¿½ÍƒNï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½\ï¿½bï¿½h
     	editor.putInt("cursor", Selection.getSelectionStart(et.getText()));
     	editor.commit();
     }
@@ -96,7 +96,7 @@ public class MemopadActivity extends Activity {
 	}
 
 	@Override
-	//ƒƒjƒ…[ƒ{ƒ^ƒ“‚Ì•\¦(‰æ–Ê•\¦ã)
+	//ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½{ï¿½^ï¿½ï¿½ï¿½Ì•\ï¿½ï¿½(ï¿½ï¿½Ê•\ï¿½ï¿½ï¿½ï¿½)
 	public boolean onCreateOptionsMenu(Menu menu) {
 		
 		MenuInflater mi = this.getMenuInflater();
@@ -106,8 +106,9 @@ public class MemopadActivity extends Activity {
 		
 	}
 
+	/*
 	@Override
-	//ƒ{ƒ^ƒ“‘I‘ğŒãA‹““®
+	//ï¿½{ï¿½^ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½
 	public boolean onOptionsItemSelected(MenuItem item) {
 		EditText et = (EditText)this.findViewById(R.id.editText1);
 		
@@ -126,5 +127,5 @@ public class MemopadActivity extends Activity {
 		
 		return super.onOptionsItemSelected(item);
 	}
-    
+    */
 }

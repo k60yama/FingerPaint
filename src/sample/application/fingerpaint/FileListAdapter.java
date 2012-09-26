@@ -38,19 +38,32 @@ public class FileListAdapter extends ArrayAdapter<Object> {
 			convertView = mInflater.inflate(R.layout.list_item_with_icon, null);
 		}
 		
+		//TextViewオブジェクトを取得
 		TextView fName = (TextView)convertView.findViewById(text1);
 		TextView fTime = (TextView)convertView.findViewById(text2);
+		
+		//ImageViewオブジェクトを取得
 		ImageView fIcon = (ImageView)convertView.findViewById(icon);
+		
+		//ファイル名・フォルダ名を設定
 		fName.setText(fc[position].getName());
+		
+		//ファイル・フォルダの更新日時を設定
 		fTime.setText(DateFormat.getDateTimeInstance().format(new Date(fc[position].lastModified())));
 		
+		//ディレクトリチェック
 		if(fc[position].isDirectory()){
+			
+			//ImageViewにフォルダアイコンを設定
 			fIcon.setImageResource(R.drawable.folder);
 		}else{
+			
+			//拡張子を指定
 			Pattern p = Pattern.compile(
 					"\\.png$|\\.jpg$|\\.gif$|\\.jpeg$|\\.bmp$",Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(fc[position].getName());
 			
+			//ファイル有無チェック
 			if(m.find()){
 				String path= fc[position].getPath();
 				BitmapFactory.Options options = new BitmapFactory.Options();
