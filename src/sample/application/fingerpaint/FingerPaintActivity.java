@@ -1,7 +1,9 @@
 package sample.application.fingerpaint;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import android.app.Activity;
@@ -93,17 +95,19 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		
 		//WindowManager型のキャスト(変数の型をWindowManager型として、受け取るため)
 		WindowManager wm = (WindowManager)this.getSystemService(Context.WINDOW_SERVICE);
+		
+		//ディスプレイのインスタンスを取得
 		Display disp = wm.getDefaultDisplay();
 		
 		w = disp.getWidth();
 		h = disp.getHeight();
 		bitmap=Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 		
-		//インスタンス生成
+		//インスタンス生成(paint、path、canvas)
 		paint = new Paint();
 		path = new Path();
 		canvas = new Canvas(bitmap);
-
+		
 		paint.setStrokeWidth(5);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
@@ -115,32 +119,44 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	
 	//保存メイン処理
 	public void save(){
-		SharedPreferences prefs = this.getSharedPreferences(
-				"FingerPaintPreferences", MODE_PRIVATE);
-		Integer imageNumber = prefs.getInt("imageNumber", 1);
+		
+		//プリファレンス取得
+		SharedPreferences prefs = this.getSharedPreferences("FingerPaintPreferences", MODE_PRIVATE);
+		Integer imageNumber = prefs.getInt("imageNumber", 1);	//imageNumberキーに格納されているデータを取得
+		
+		//ファイル格納変数初期化
 		File file = null;
 		
 		//SDカードチェック
 		if(externalMediaChecker()){
-			DecimalFormat form = new DecimalFormat("0000");
-			String path = Environment.getExternalStorageDirectory() + "/mypaint/";
-			File outDir = new File(path);
 			
-			//フォルダ作成
+			//ファイル名の採番形式を数字4桁方式
+			DecimalFormat form = new DecimalFormat("0000");
+			
+			//microSDカードのディレクトリ + /mypaint/
+			String path = Environment.getExternalStorageDirectory() + "/mypaint/";
+			
+			//Fileクラスのインスタンスを生成
+			File outDir = new File(path);	
+			
+			//ディレクトリチェック(なければ新規作成)
 			if(!outDir.exists()){
-				outDir.mkdir();
+				outDir.mkdir();		//ディレクトリ作成
 			}
 			
-			//ファイル作成(ファイルが存在するまで)
+			//既にファイルがある場合は、新しい採番を割り当てる
 			do{
+				//Fileクラスのインスタンスを生成
 				file = new File(path + "img" + form.format(imageNumber) + ".png");
-				imageNumber++;
+				imageNumber++;		//インクリメント
 			}while(file.exists());
 			
 			//連番保存
 			if(writeImage(file)){
 				//メディアスキャンの実行
 				this.scanMedia(file.getPath());
+				
+				//ファイル名に採番した番号をプリファレンスに保存する(imageNumberキーに割り当てる)
 				SharedPreferences.Editor editor = prefs.edit();
 				editor.putInt("imageNumber", imageNumber);
 				editor.commit();
@@ -150,10 +166,12 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	
 	//microSDカードの有無確認
 	public boolean externalMediaChecker(){
-		
 		boolean result = false;
+		
+		//microSDカードの状態を取得
 		String status = Environment.getExternalStorageState();
 		
+		//microSDカードのマウントチェック(使用可能状態か？)
 		if(status.equals(Environment.MEDIA_MOUNTED)){
 			result = true;
 		}
@@ -162,12 +180,51 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	
 	//書き込み処理
 	public boolean writeImage(File file){
+		
+		/*
+		FileOutputStream fo = null;
+		
 		try{
-			FileOutputStream fo = new FileOutputStream(file);
+			//ファイルの作成
+			fo = new FileOutputStream(file);
+			
+			//BMP形式からPNG形式に圧縮
 			bitmap.compress(CompressFormat.PNG, 100, fo);
-			fo.flush();
-			fo.close();
-		}catch(Exception e){
+			
+			fo.flush();		//ファイル書き込み(バッファに格納されているデータを物理デバイスに作成)
+			//fo.close();		//ファイルを閉じる
+		}catch(FileNotFoundException r){
+			r.printStackTrace();
+			return false;
+		}catch(IOException r){
+			
+			//System.out.println(e.getLocalizedMessage());
+			//return false;
+			
+			//throw r;
+			//r.printStackTrace();
+			return false;
+		}finally{
+			try {
+				fo.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+		*/
+		
+		try{
+			//ファイルの作成
+			FileOutputStream fo = new FileOutputStream(file);
+			
+			//BMP形式からPNG形式に圧縮
+			bitmap.compress(CompressFormat.PNG, 100, fo);
+			
+			fo.flush();		//ファイル書き込み(バッファに格納されているデータを物理デバイスに作成)
+			fo.close();		//ファイルを閉じる
+		}catch(IOException e){
 			System.out.println(e.getLocalizedMessage());
 			return false;
 		}
@@ -304,6 +361,7 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	}
 	
 	@Override
+	//遷移先のアクティビティが終了したとき
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
 		bitmap = loadImage(data.getStringExtra("fn"));
