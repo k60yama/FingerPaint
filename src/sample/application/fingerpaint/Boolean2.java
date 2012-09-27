@@ -1,5 +1,6 @@
 package sample.application.fingerpaint;
 
+/*
 public enum Boolean2 {
 	TRUE(true),False(false);
 	
@@ -10,3 +11,4 @@ public enum Boolean2 {
 	 }
 	 
 }
+*/

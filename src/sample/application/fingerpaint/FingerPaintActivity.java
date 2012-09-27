@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -186,9 +187,11 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
 		case R.id.menu_save:
+			//保存処理へ
 			save();
 			break;
 		case R.id.menu_open:
+			//インテント生成
 			Intent intent = new Intent(this, FilePicker.class);
 			startActivityForResult(intent, 0);
 			break;
@@ -196,16 +199,44 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 			final String[] items = getResources().getStringArray(R.array.ColorName);
 			final int[] colors = getResources().getIntArray(R.array.Color);
 			
+			//ダイアログ生成
 			AlertDialog.Builder ab = new AlertDialog.Builder(this);
-			ab.setTitle(R.string.menu_color_change);
+			ab.setTitle(R.string.menu_color_change);		//ダイアログの件名
+			
+			//ダイアログに表示するカラーバリエーション
 			ab.setItems(items, new DialogInterface.OnClickListener(){
+				//押下された色に変更
 				public void onClick(DialogInterface dialog, int item){
 					paint.setColor(colors[item]);
 				}
 			});
+			
+			//ダイアログ表示
 			ab.show();
 			break;
 		case R.id.menu_new:
+			//通常ダイアログ生成
+			ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string.menu_new);			//ダイアログの件名
+			ab.setMessage(R.string.confirm_new);	//ダイアログの本文
+			
+			//OKボタンを押下した場合
+			ab.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					//キャンバスを初期化
+					canvas.drawColor(Color.WHITE);		
+					((ImageView)findViewById(R.id.imageView1)).setImageBitmap(bitmap);
+				}
+			});
+			
+			//キャンセルを押下した場合
+			ab.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+			
+			//ダイアログ表示
+			ab.show();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -279,5 +310,34 @@ public class FingerPaintActivity extends Activity implements OnTouchListener{
 		canvas = new Canvas(bitmap);
 		ImageView iv = (ImageView)this.findViewById(R.id.imageView1);
 		iv.setImageBitmap(bitmap);
+	}
+	
+	//Backキーを押下した場合
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			//ダイアログ生成
+			AlertDialog.Builder ab = new AlertDialog.Builder(this);
+			ab.setTitle(R.string.title_exit);			//ダイアログの件名
+			ab.setMessage(R.string.confirm_new);		//ダイアログの本文
+			
+			//OKボタンを押下した場合
+			ab.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					finish();		//アクティビティ終了
+				}
+			});
+			
+			//キャンセルボタンを押下した場合
+			ab.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+			
+			//ダイアログ表示
+			ab.show();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

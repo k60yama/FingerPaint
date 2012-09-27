@@ -14,7 +14,7 @@ import android.text.Selection;
 import android.widget.EditText;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
+//import android.view.MenuItem;
 
 public class MemopadActivity extends Activity {
     /** Called when the activity is first created. */
